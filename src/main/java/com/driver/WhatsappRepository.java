@@ -47,15 +47,14 @@ public class WhatsappRepository {
         if(user.size()<=2){
             Group group = new Group(user.get(1).getName(),user.size());
             personalChatDB.put(group,user);
-            return null;
-        }
-            Group group = new Group(("Group" + " " + user.size()), user.size());
-            adminDB.put(user.get(0), group);
-            groupUserDB.put(group, user);
-            ++customGroupCount;
             return group;
+        }
+        Group group = new Group(("Group" + " " + user.size()), user.size());
+        adminDB.put(user.get(0), group);
+        groupUserDB.put(group, user);
+        ++customGroupCount;
+        return group;
     }
-
     public int createMessage(String content){
         messageDB.put(messageId,new Message(messageId,content));
         ++messageId;
