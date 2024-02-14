@@ -36,7 +36,7 @@ public class WhatsappRepository {
     }
 
     public String createUser(String name, String mobile) throws Exception {
-        if(userDB.containsKey(mobile)) throw new Exception("User Already Exist");
+        if(userDB.containsKey(mobile)) throw new Exception("User already exists");
         else{
             userDB.put(mobile, new User(name,mobile));
             return "SUCCESS";
@@ -65,7 +65,7 @@ public class WhatsappRepository {
     }
     public int sendMessage(Message message, User sender, Group group) throws Exception {
         if(!groupUserDB.containsKey(group)) throw new Exception("Group does not exist");
-        if(!groupUserDB.get(group).contains(sender)) throw new Exception("You are not allowed to send message");
+        if(!groupUserDB.get(group).contains(sender)) throw new Exception("Group does not exist");
 
         if(!groupMessageDB.containsKey(group)) groupMessageDB.put(group,new ArrayList<>());
         List<Message> list = groupMessageDB.get(group);
@@ -81,8 +81,8 @@ public class WhatsappRepository {
     }
     public String changeAdmin(User approver, User user, Group group) throws Exception {
         if(!groupUserDB.containsKey(group)) throw new Exception("Group does not exist");
-        if(!groupUserDB.get(group).get(0).getName().equals(approver.getName())) throw new Exception("Mentioned Approver is not the admin");
-        if(!groupUserDB.get(group).contains(user)) throw new Exception("Mentioned User doesn't exist");
+        if(!groupUserDB.get(group).get(0).getName().equals(approver.getName())) throw new Exception("Approver does not have rights");
+        if(!groupUserDB.get(group).contains(user)) throw new Exception("User is not a participant");
 
         int indexOfUser = groupUserDB.get(group).indexOf(user);
         List<User> changeAdmin = groupUserDB.get(group);
