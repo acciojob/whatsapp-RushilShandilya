@@ -48,13 +48,12 @@ public class WhatsappRepository {
             Group group = new Group(user.get(1).getName(),user.size());
             personalChatDB.put(group,user);
             return group;
-        }else {
-            Group group = new Group(("Group" + " " + user.size()), user.size());
-            adminDB.put(user.get(0), group);
-            groupUserDB.put(group, user);
-            ++customGroupCount;
-            return group;
         }
+        Group group = new Group(("Group" + " " + user.size()), user.size());
+        adminDB.put(user.get(0), group);
+        groupUserDB.put(group, user);
+        ++customGroupCount;
+        return group;
     }
     public int createMessage(String content){
         messageDB.put(messageId,new Message(messageId,content));
@@ -63,8 +62,8 @@ public class WhatsappRepository {
         return this.messageId;
     }
     public int sendMessage(Message message, User sender, Group group) throws Exception {
-        if(!groupUserDB.containsKey(group)) throw new Exception("Group does not exist");
-        if(!groupUserDB.get(group).contains(sender)) throw new Exception("You are not allowed to send message");
+        if(!groupUserDB.containsKey(group) && !personalChatDB.containsKey(group)) throw new Exception("Group does not exist");
+        if(!groupUserDB.get(group).contains(sender) && !personalChatDB.get(group).contains(sender)) throw new Exception("You are not allowed to send message");
 
         if(!groupMessageDB.containsKey(group)) groupMessageDB.put(group,new ArrayList<>());
         List<Message> list = groupMessageDB.get(group);
