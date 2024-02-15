@@ -13,6 +13,7 @@ public class WhatsappRepository {
     private HashMap<String,User> userDB;
     private HashMap<Group , List<User>> groupUserDB;
     private HashMap<Group , List<User>> personalChatDB;
+    private HashMap<Group , List<Message>> personalChatMessages;
     private HashMap<Integer, Message> messageDB;
     private HashMap<Group, List<Message>> groupMessageDB;
     private HashMap<User,Group> adminDB;
@@ -29,6 +30,7 @@ public class WhatsappRepository {
         groupMessageDB = new HashMap<>();
         adminDB = new HashMap<>();
         senderDB = new HashMap<>();
+        personalChatMessages = new HashMap<>();
 
         this.customGroupCount = 0;
         this.messageId = 0;
@@ -63,23 +65,39 @@ public class WhatsappRepository {
         return this.messageId;
     }
     public int sendMessage(Message message, User sender, Group group) throws Exception {
-        if(!personalChatDB.containsKey(group)) throw new Exception("Group does not exist");
-        if(!personalChatDB.get(group).contains(sender)) throw new Exception("You are not allowed to send message");
 
-        if(!groupUserDB.containsKey(group)) throw new Exception("Group does not exist");
-        if(!groupUserDB.get(group).contains(sender)) throw new Exception("You are not allowed to send message");
+        List<User> personalChatList = personalChatDB.get(group);
+        List<User> groupChatList = groupUserDB.get(group);
 
-        if(!groupMessageDB.containsKey(group)) groupMessageDB.put(group,new ArrayList<>());
-        List<Message> list = groupMessageDB.get(group);
-        list.add(message);
-        groupMessageDB.put(group,list);
+        if(personalChatList==null && groupChatList==null) throw new Exception("Group does not exist");
+        if(personalChatList!=null){
+            if(!personalChatList.contains(sender)) throw new Exception("You are not allowed to send message");
+            if(!personalChatMessages.containsKey(group)) personalChatMessages.put(group, new ArrayList<>());
+            List<Message> messageList = personalChatMessages.get(group);
+            messageList.add(message);
+            personalChatMessages.put(group,messageList);
 
-        if(!senderDB.containsKey(sender)) senderDB.put(sender,new ArrayList<>());
-        List<Message> messageList = senderDB.get(sender);
-        messageList.add(message);
-        senderDB.put(sender,messageList);
+            if(!senderDB.containsKey(sender)) senderDB.put(sender, new ArrayList<>());
+            List<Message> listOfMessage = senderDB.get(sender);
+            listOfMessage.add(message);
+            senderDB.put(sender,listOfMessage);
 
-        return groupMessageDB.get(group).size();
+
+            return personalChatMessages.get(group).size();
+        }else{
+            if(!groupUserDB.get(group).contains(sender)) throw new Exception("You are not allowed to send message");
+            if(!groupMessageDB.containsKey(group)) groupMessageDB.put(group , new ArrayList<>());
+            List<Message> messageList = groupMessageDB.get(group);
+            messageList.add(message);
+            groupMessageDB.put(group,messageList);
+
+            if(!senderDB.containsKey(sender)) senderDB.put(sender, new ArrayList<>());
+            List<Message> listOfMessage = senderDB.get(sender);
+            listOfMessage.add(message);
+            senderDB.put(sender,listOfMessage);
+
+            return groupMessageDB.get(group).size();
+        }
     }
     public String changeAdmin(User approver, User user, Group group) throws Exception {
         if(!groupUserDB.containsKey(group)) throw new Exception("Group does not exist");
